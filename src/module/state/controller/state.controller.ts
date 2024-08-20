@@ -36,10 +36,7 @@ export class StateController {
       @Param("id") id: string,
       @Body() StateData: { StateCode: string, StateName: string, CountryCode: string, Active: boolean, SortSeq: number },
     ): Promise<StateModel> {
-      return this.stateService.updateState({
-        where: { id: id },
-        data: StateData,
-      });
+      return this.stateService.updateState(id, StateData,);
     }
 
     @Delete(":id")

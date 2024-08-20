@@ -154,10 +154,7 @@ export class CountryController {
       @Param("id") id: string,
       @Body() CountryData: { CountryCode: string, CountryName: string, Active: boolean, SortSeq: number },
     ): Promise<CountryModel> {
-      return this.countryService.updateCountry({
-        where: { id: id },
-        data: CountryData,
-      });
+      return this.countryService.updateCountry(id,CountryData,);
     }
 /**
    * @route DELETE /country/:id
@@ -166,7 +163,7 @@ export class CountryController {
    * @returns The deleted country object.
    * @throws  Throws a 404 Not Found error if the country with the specified ID does not exist.
    * @example
-   * curl -X DELETE http://localhost:3000/country/1
+   * curl -X DELETE http://localhost:3000/country/10
    * 
    * Response:
    * {

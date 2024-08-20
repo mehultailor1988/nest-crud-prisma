@@ -37,10 +37,7 @@ export class CityController {
       @Param("id") id: string,
       @Body() CityData: { CityName: string; StateCode: string; CountryCode: string; Active: boolean; SortSeq: number  },
     ): Promise<CityModel> {
-      return this.cityService.updateCity({
-        where: { id: id },
-        data: CityData,
-      });
+      return this.cityService.updateCity(id, CityData);
     }
 
     @Delete(":id")

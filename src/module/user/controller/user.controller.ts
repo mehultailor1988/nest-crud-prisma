@@ -6,9 +6,13 @@ import {
     Param,
     Post,
     Put,
+    Patch,
+    ValidationPipe ,
   } from "@nestjs/common";
   import { UserService } from "../services/user.service";
   import { User as UserModel } from "@prisma/client";
+  import { UpdateUserDto  } from '../dto/update-user.dto';
+  import { CreateUserDto, validateDto } from '../dto/create-user.dto';
   
   @Controller("user")
   export class UserController {
@@ -34,13 +38,11 @@ import {
     @Put(":id")
     async updateUser(
       @Param("id") id: string,
-      @Body() userData: { email: string; name: string },
+      @Body() UserData: { email: string, name: string },
     ): Promise<UserModel> {
-      return this.userService.updateUser({
-        where: { id: id },
-        data: userData,
-      });
+      return this.userService.updateUser(id, UserData);
     }
+
   
     @Delete(":id")
     async deleteUser(@Param("id") id: string): Promise<UserModel> {

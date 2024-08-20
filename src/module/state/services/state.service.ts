@@ -5,6 +5,7 @@ import { StateDto } from "../dto";
 import { createCustomError } from "src/common/utils/helpers";
 import { plainToInstance } from "class-transformer";
 // import { State } from "../entities/state.entity";
+import { CreateStatetDto, validateDto } from '../dto/create-state.dto';
 
 @Injectable()
 export class StateService {
@@ -46,17 +47,47 @@ export class StateService {
   }
 
 
-  async createState(data: Prisma.StateCreateInput): Promise<State> {
-    this.logger.log("createstate");
-    try {
-      const createstate = await this.prisma.state.create({
-        data,
-      });
+  // async createState(data: Prisma.StateCreateInput): Promise<State> {
+  //   this.logger.log("createstate");
+  //   try {
+  //     const createstate = await this.prisma.state.create({
+  //       data,
+  //     });
       
+  //     return createstate;
+  //   } catch (e) {
+  //     console.log("ERROR", e);
+      
+  //     throw createCustomError(
+  //       e.message || "Something went wrong",
+  //       e.status || HttpStatus.BAD_REQUEST,
+  //     );
+  //   }
+  // }
+
+  async createState(dto: CreateStatetDto): Promise<State> {
+    try {
+      // Validate the DTO
+      await validateDto(dto);
+
+      // Create the state
+      const createstate = await this.prisma.state.create({
+        data: {
+        
+          StateCode: dto.StateCode,
+          StateName: dto.StateName,
+          CountryCode: dto.CountryCode,
+          Active: dto.Active,
+          SortSeq: dto.SortSeq,
+         
+        },
+      });
+
+      console.log("state created:", createstate);
       return createstate;
     } catch (e) {
       console.log("ERROR", e);
-      
+
       throw createCustomError(
         e.message || "Something went wrong",
         e.status || HttpStatus.BAD_REQUEST,
@@ -65,18 +96,51 @@ export class StateService {
   }
 
 
-  async updateState(params: {
-    where: Prisma.StateWhereUniqueInput;
-    data: Prisma.StateUpdateInput;
-  }): Promise<State> {
-    this.logger.log("updateSate");
+  // async updateState(params: {
+  //   where: Prisma.StateWhereUniqueInput;
+  //   data: Prisma.StateUpdateInput;
+  // }): Promise<State> {
+  //   this.logger.log("updateSate");
+  //   try {
+  //     const updateState = await this.prisma.state.update({
+  //       where: params.where,
+  //       data: params.data,
+  //     });
+  //     return updateState;
+  //   } catch (e) {
+  //     throw createCustomError(
+  //       e.message || "Something went wrong",
+  //       e.status || HttpStatus.BAD_REQUEST,
+  //     );
+  //   }
+  // }
+
+  
+  
+  async updateState(id : string,dto: CreateStatetDto): Promise<State> {
     try {
-      const updateState = await this.prisma.state.update({
-        where: params.where,
-        data: params.data,
+      // Validate the DTO
+      await validateDto(dto);
+
+      // Update the state
+      const Upadtestate = await this.prisma.state.update({
+        where: { id },
+        data: {
+        
+          StateCode: dto.StateCode,
+          StateName: dto.StateName,
+          CountryCode: dto.CountryCode,
+          Active: dto.Active,
+          SortSeq: dto.SortSeq,
+         
+        },
       });
-      return updateState;
+
+      console.log("Update State:", Upadtestate);
+      return Upadtestate;
     } catch (e) {
+      console.log("ERROR", e);
+
       throw createCustomError(
         e.message || "Something went wrong",
         e.status || HttpStatus.BAD_REQUEST,

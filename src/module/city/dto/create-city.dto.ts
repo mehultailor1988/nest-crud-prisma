@@ -1,4 +1,5 @@
-import {  IsNotEmpty } from "class-validator";
+import {  IsNotEmpty, validate } from "class-validator";
+import { plainToInstance } from "class-transformer";
 
 export class CreateCityDto {
  
@@ -16,4 +17,17 @@ export class CreateCityDto {
   
   @IsNotEmpty({ message: "Active is required" })
   SortSeq: number;
+}
+
+export async function validateDto(dto: CreateCityDto): Promise<void> {
+  const instance = plainToInstance(CreateCityDto, dto);
+  const errors = await validate(instance);
+
+  if (errors.length > 0) {
+    const messages = errors
+      .map(error => Object.values(error.constraints))
+      .flat()
+      .join(', ');
+    throw new Error(`Validation failed: ${messages}`);
+  }
 }
