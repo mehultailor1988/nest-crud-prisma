@@ -1,5 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength, validate } from "class-validator";
 import { AbstractDto } from "src/common";
+import { Exclude, Expose } from 'class-transformer';
 
 
 export class UserDto extends AbstractDto {
@@ -7,6 +8,12 @@ export class UserDto extends AbstractDto {
   @MinLength(15)
   @IsNotEmpty({ message: "email is required" })
   email: string;
+
+  @Exclude()
+  password: string;
+
+  @IsNotEmpty({ message: "email is required" })
+  phone: string;
 
   @IsString()
   name: string;
