@@ -16,7 +16,7 @@ import {
   import { UpdateUserDto  } from '../dto/update-user.dto';
   import { CreateUserDto, validateDto } from '../dto/create-user.dto';
   import { UserDto } from "../dto";
-  import { ApiTags, ApiOperation, ApiResponse, ApiBody  } from '@nestjs/swagger';
+  import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam  } from '@nestjs/swagger';
   
   @ApiTags('User')
   @Controller("user")
@@ -109,10 +109,13 @@ import {
     @ApiOperation({ summary: 'Create a new user' })
     @ApiResponse({ status: 201, description: 'The user has been successfully created.', type: UserDto })
     @ApiResponse({ status: 400, description: 'Bad request.' })
-    async signupUser(
-      @Body() userData: { email: string, password: string, phone: string },
-    ): Promise<UserModel> {
-      return this.userService.createUser(userData);
+    // async signupUser(
+    //   @Body() userData: { email: string, password: string, phone: string },
+    // ): Promise<UserModel> {
+    //   return this.userService.createUser(userData);
+    // }
+    async signupUser(@Body() dto: CreateUserDto) {
+      return this.userService.createUser(dto);
     }
 
      /**
@@ -147,13 +150,15 @@ import {
     @ApiBody({ type: UpdateUserDto })
     @ApiResponse({ status: 200, description: 'The user has been successfully updated.', type: UserDto })
     @ApiResponse({ status: 404, description: 'User not found' })
-    async updateUser(
-      @Param("id") id: string,
-      @Body() UserData: { email: string, password: string, phone: string },
-    ): Promise<UserModel> {
-      return this.userService.updateUser(id, UserData);
+    // async updateUser(
+    //   @Param("id") id: string,
+    //   @Body() UserData: { email: string, password: string, phone: string },
+    // ): Promise<UserModel> {
+    //   return this.userService.updateUser(id, UserData);
+    // }
+    async updateUser(@Param('id') id: string,@Body() dto: CreateUserDto) {
+      return this.userService.updateUser(id, dto);
     }
-
      /**
      * @summary Delete a user by their ID
      * @description Deletes a user specified by their ID.
@@ -177,8 +182,11 @@ import {
     @ApiOperation({ summary: 'Delete a user by ID' })
     @ApiResponse({ status: 200, description: 'The user has been successfully deleted.', type: UserDto })
     @ApiResponse({ status: 404, description: 'User not found' })
-    async deleteUser(@Param("id") id: string): Promise<UserModel> {
-      return this.userService.deleteUser({ id: id });
+    // async deleteUser(@Param("id") id: string): Promise<UserModel> {
+    //   return this.userService.deleteUser({ id: id });
+    // }
+    async deleteUser(@Param('id') id: string,@Body() dto: CreateUserDto) {
+      return this.userService.deleteUser(id, dto);
     }
 
     /**
@@ -194,7 +202,7 @@ import {
      * POST http://localhost:3000/user/login
      * {
      *   "email": "Test@gmail.com",
-     *   "password": "securepassword"
+     *   "password": "test@123"
      * }
      * 
      * // Example response
@@ -209,7 +217,9 @@ import {
      *   }
      * }
      */
-    @ApiOperation({ summary: 'Log in a user' })
+    @ApiTags('Login')
+    @Post(':login')
+    @ApiOperation({ summary: 'Login a user' })
     @ApiBody({ type: CreateUserDto }) // Adjust if needed; assuming login data is the same as user creation
     @ApiResponse({ status: 200, description: 'Successful login', type: UserDto })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -225,6 +235,64 @@ import {
         message: response.message,
         data: response.data,
       };
+    }
 
+    /**
+   * @route POST /tokens/:userid
+   * @description Creates a token for a specified user.
+   * @param {string} userid - The unique identifier of the user.
+   * @returns {object} The object containing the generated token.
+   * @throws {HttpException} Throws 500 if unable to create token.
+   * @example
+   * curl -X POST http://localhost:3000/user/tokens/12345
+   * 
+   * Response:
+   * {
+   *   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTYiLCJleHBpcmVkX2JldGFnIjoiZGF0YSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+   * }
+   * 
+   * Error Response:
+   * {
+   *   "statusCode": 500,
+   *   "message": "Unable to create token"
+   * }
+   */
+  @ApiTags('token')
+  @Post('token/:userid')
+  @ApiOperation({ summary: 'Create a token for a user' })
+  @ApiParam({
+    name: 'userid',
+    description: 'The unique identifier of the user',
+    type: String
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Token successfully created',
+    schema: {
+      example: {
+        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTYiLCJleHBpcmVkX2JldGFnIjoiZGF0YSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+      }
+    }
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error - Unable to create token',
+    schema: {
+      example: {
+        statusCode: 500,
+        message: 'Unable to create token'
+      }
+    }
+  })
+    async createToken(@Param('userid') userid: string): Promise<{ token: string }> {
+      try {
+        const token = await this.userService.createToken(userid);
+        return { token };
+      } catch (e) {
+        throw new HttpException(
+          e.message || 'Unable to create token',
+          e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
   }

@@ -1,10 +1,11 @@
 import { HttpStatus, Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { Prisma, User } from "@prisma/client";
+import { Prisma, User, Token } from "@prisma/client";
 import { UserDto } from "../dto";
 import { plainToInstance } from "class-transformer";
 import { createCustomError } from "src/common/utils/helpers";
 import { CreateUserDto, validateDto } from '../dto/create-user.dto';
+
 
 import * as bcrypt from 'bcrypt'; // Import bcrypt
 import { JwtService } from '@nestjs/jwt';
@@ -66,7 +67,7 @@ export class UserService {
   //   }
   // }
   
-  async createUser(dto: CreateUserDto): Promise<User> {
+  async createUser(dto: CreateUserDto): Promise<{ statusCode: number; message: string; data: User | null }> {
     try {
       // Validate the DTO
       await validateDto(dto);
@@ -74,7 +75,7 @@ export class UserService {
       const hashedPassword = await bcrypt.hash(dto.password, 10);
 
       // Create the user
-      const createUser = await this.prisma.user.create({
+      const createUser = await this.prisma.user.create({        
         data: {
         
           email: dto.email,
@@ -85,7 +86,12 @@ export class UserService {
       });
 
       console.log("User created:", createUser);
-      return createUser;
+      //return createUser;
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'User successfully created',
+        data: createUser,
+      };
     } catch (e) {
       console.log("ERROR", e);
 
@@ -171,7 +177,7 @@ export class UserService {
   //   }
   // }
   
-  async updateUser(id : string,dto: CreateUserDto): Promise<User> {
+  async updateUser(id : string,dto: CreateUserDto): Promise<{ statusCode: number; message: string; data: User | null}> {
     try {
       // Validate the DTO
       await validateDto(dto);
@@ -179,7 +185,7 @@ export class UserService {
       const hashedPassword = await bcrypt.hash(dto.password, 10);
 
       // Create the user
-      const createUser = await this.prisma.user.update({
+      const Updateuser = await this.prisma.user.update({
         where: { id },
         data: {
         
@@ -190,8 +196,13 @@ export class UserService {
         },
       });
 
-      console.log("User created:", createUser);
-      return createUser;
+      console.log("User created:", Updateuser);
+      //return createUser;
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'User successfully updated',
+        data: Updateuser,
+      };
     } catch (e) {
       console.log("ERROR", e);
 
@@ -202,13 +213,18 @@ export class UserService {
     }
   }
 
-  async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
+  async deleteUser(id : string,dto: CreateUserDto): Promise<{statusCode: number; message: string; data: User | null}> {
     this.logger.log("deleteUser");
     try {
       const deleteUser = await this.prisma.user.delete({
-        where,
+        where : { id },
       });
-      return deleteUser;
+      //return deleteUser;
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'User successfully deleted',
+        data: deleteUser,
+      };
     } catch (e) {
       throw createCustomError(
         e.message || "Something went wrong",
@@ -236,13 +252,13 @@ export class UserService {
         throw createCustomError("Invalid credentials", HttpStatus.UNAUTHORIZED);
       }
 
-      const payload = { userId: user.id }; // Adjust payload as needed
-      const token = this.jwtService.sign(payload);
+     // const payload = { userId: user.id }; // Adjust payload as needed
+     // const token = this.jwtService.sign(payload);
 
-      console.log("token", token);
+      //console.log("token", token);
       
       // Store the token in the database
-      await this.createToken(user.id, token);
+      //await this.createToken(user.id, token);
 
       //return plainToInstance(UserDto, user);
       const userDto = plainToInstance(UserDto, user);
@@ -260,21 +276,46 @@ export class UserService {
       );
     }
   }  
-  async createToken(userid : string, token: string): Promise<{userid : string, token: string}> {
-    try {
-      // Validate the DTO
-      //await validateDto(dto);
+  // async createToken(userid : string, token: string): Promise<{userid : string, token: string}> {
+  //   try {
+  //     // Validate the DTO
+  //     //await validateDto(dto);
 
-      // Create the Token
+  //     // Create the Token
+  //     const createtoken = await this.prisma.token.create({
+  //       data: {
+  //         userid: userid,
+  //         token: token         
+  //       },
+  //     });
+
+  //     console.log("token created:", createtoken);
+  //     return createtoken;
+  //   } catch (e) {
+  //     console.log("ERROR", e);
+
+  //     throw createCustomError(
+  //       e.message || "Something went wrong",
+  //       e.status || HttpStatus.BAD_REQUEST,
+  //     );
+  //   }
+  // }  
+  async createToken(userid : string): Promise<string> {
+    try {
+     
+      const payload = { userId: userid }; 
+      const token = this.jwtService.sign(payload);
+
+      // Create the user
       const createtoken = await this.prisma.token.create({
         data: {
           userid: userid,
-          token: token,         
+          token: token,
         },
       });
 
       console.log("token created:", createtoken);
-      return createtoken;
+      return createtoken.token;;
     } catch (e) {
       console.log("ERROR", e);
 
