@@ -48,9 +48,18 @@ import {
     @Get()
     @ApiOperation({ summary: 'Get all users' })
     //@ApiResponse({ status: 200, description: 'List of all users', type: [UserDto] })
-    async getAllUsers() {
-      return this.userService.getAllUsers();
+    async getAllUsers(): Promise<{ statusCode: number; message: string; data: UserDto[] }> {
+      //return this.userService.getAllUsers();
+      try {
+        return await this.userService.getAllUsers();
+      } catch (e) {
+        throw new HttpException(
+          e.message || 'Unable to retrieve users',
+          e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
+    
   
      /**
      * @summary Retrieve a user by their ID
@@ -75,9 +84,18 @@ import {
     @ApiOperation({ summary: 'Get a user by ID' })
     @ApiResponse({ status: 200, description: 'User details', type: UserDto })
     @ApiResponse({ status: 404, description: 'User not found' })
-    async getUser(@Param("id") id: string) {
-      return this.userService.user({ id: id });
+    async getUser(@Param("id") id: string): Promise<{ statusCode: number; message: string; data?: UserDto }>{
+      //return this.userService.user({ id: id });
+      try {
+        return await this.userService.user({ id });
+      } catch (e) {
+        throw new HttpException(
+          e.message || 'Unable to retrieve user',
+          e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
+    
   
       /**
      * @summary Create a new user

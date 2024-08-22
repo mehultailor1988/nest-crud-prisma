@@ -21,7 +21,7 @@ export class UserService {
 
   async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-  ): Promise<User | null> {
+  ): Promise<{ statusCode: number; message: string; data?: UserDto}> {
     try {
       const user = await this.prisma.user.findUnique({
         where: userWhereUniqueInput,
@@ -29,7 +29,13 @@ export class UserService {
       if (!user) {
         throw createCustomError("User not found", HttpStatus.NOT_FOUND);
       }
-      return plainToInstance(UserDto, user);
+      //return plainToInstance(UserDto, user);
+      const userDto = plainToInstance(UserDto, user);
+      return {
+        statusCode: HttpStatus.OK,
+        message: "User found successfully",
+        data: userDto, // Wrap the single DTO in an array
+      };
     } catch (e) {
       throw createCustomError(
         e.message || "Something went wrong",
@@ -37,11 +43,17 @@ export class UserService {
       );
     }
   }
-  async getAllUsers() {
+
+  async getAllUsers(): Promise<{ statusCode: number; message: string; data: UserDto[] }> {
     this.logger.log("getAllUsers");
     try {
       const users = await this.prisma.user.findMany();
-      return plainToInstance(UserDto, users);
+      const userDtos = plainToInstance(UserDto, users);
+      return {
+        statusCode: HttpStatus.OK,
+        message: "Users retrieved successfully",
+        data: userDtos,
+      };
     } catch (e) {
       throw createCustomError(
         e.message || "Something went wrong",
