@@ -10,7 +10,11 @@ import {
 import { CountryService } from '../services/country.service';
 import { Country as CountryModel } from "@prisma/client";
 import { UpdateCountryDto } from "../dto";
+import { CountryDto } from "../dto/country.dto";
+import { CreateCountryDto } from "../dto/create-country.dto";
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiQuery } from '@nestjs/swagger';
 
+@ApiTags('Country')
 @Controller('country')
 export class CountryController {
   constructor(private readonly countryService: CountryService) {}
@@ -43,6 +47,9 @@ export class CountryController {
    */
 
   @Get()
+  @ApiOperation({ summary: 'Retrieve all countries' })
+  @ApiResponse({ status: 200, description: 'List of all countries', type: [CountryDto] })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async getAllCountry() {
     return this.countryService.getAllCountry();
   }
@@ -73,6 +80,10 @@ export class CountryController {
    */
 
   @Get(":id")
+  @ApiOperation({ summary: 'Retrieve a country by ID' })
+  @ApiParam({ name: 'id', description: 'The unique identifier of the country', type: String })
+  @ApiResponse({ status: 200, description: 'Country details', type: CountryDto })
+  @ApiResponse({ status: 404, description: 'Country not found' })
     async getCountry(@Param("id") id: string) {
       return this.countryService.country({ id: id });
     }
@@ -87,8 +98,8 @@ export class CountryController {
    * curl -X POST http://localhost:3000/country \
    *   -H "Content-Type: application/json" \
    *   -d '{
-   *         "CountryCode": "US",
-   *         "CountryName": "United States",
+   *         "CountryCode": "IND",
+   *         "CountryName": "INDIA",
    *         "Active": true,
    *         "SortSeq": 1
    *       }'
@@ -96,8 +107,8 @@ export class CountryController {
    * Response:
    * {
    *   "id": "3",
-   *   "CountryCode": "US",
-   *   "CountryName": "United States",
+   *   "CountryCode": "IND",
+   *   "CountryName": "INDIA",
    *   "Active": true,
    *   "SortSeq": 1
    * }
@@ -110,6 +121,10 @@ export class CountryController {
    */
 
     @Post()
+    @ApiOperation({ summary: 'Create a new country' })
+    @ApiBody({ type: CreateCountryDto })
+    @ApiResponse({ status: 201, description: 'Country created successfully', type: CountryDto })
+    @ApiResponse({ status: 400, description: 'Invalid input data' })
     async signupCountry(
       @Body() CountryData: { CountryCode: string, CountryName: string, Active: boolean, SortSeq: number },
     ): Promise<CountryModel> {
@@ -127,8 +142,8 @@ export class CountryController {
    * curl -X PUT http://localhost:3000/country/1 \
    *   -H "Content-Type: application/json" \
    *   -d '{
-   *         "CountryCode": "US",
-   *         "CountryName": "United States of America",
+   *         "CountryCode": "IND",
+   *         "CountryName": "INDIA",
    *         "Active": true,
    *         "SortSeq": 1
    *       }'
@@ -136,8 +151,8 @@ export class CountryController {
    * Response:
    * {
    *   "id": "1",
-   *   "CountryCode": "US",
-   *   "CountryName": "United States of America",
+   *   "CountryCode": "IND",
+   *   "CountryName": "INDIA",
    *   "Active": true,
    *   "SortSeq": 1
    * }
@@ -150,6 +165,11 @@ export class CountryController {
    */
 
     @Put(":id")
+    @ApiOperation({ summary: 'Update a country by ID' })
+    @ApiParam({ name: 'id', description: 'The unique identifier of the country', type: String })
+    @ApiBody({ type: UpdateCountryDto })
+    @ApiResponse({ status: 200, description: 'Country updated successfully', type: CountryDto })
+    @ApiResponse({ status: 404, description: 'Country not found' })
     async updateCountry(
       @Param("id") id: string,
       @Body() CountryData: { CountryCode: string, CountryName: string, Active: boolean, SortSeq: number },
@@ -168,8 +188,8 @@ export class CountryController {
    * Response:
    * {
    *   "id": "1",
-   *   "CountryCode": "US",
-   *   "CountryName": "United States",
+   *   "CountryCode": "IND",
+   *   "CountryName": "INDIA",
    *   "Active": true,
    *   "SortSeq": 1
    * }
@@ -182,6 +202,10 @@ export class CountryController {
    */
 
     @Delete(":id")
+    @ApiOperation({ summary: 'Delete a country by ID' })
+    @ApiParam({ name: 'id', description: 'The unique identifier of the country', type: String })
+    @ApiResponse({ status: 200, description: 'Country deleted successfully', type: CountryDto })
+    @ApiResponse({ status: 404, description: 'Country not found' })
     async deleteCountry(@Param("id") id: string): Promise<CountryModel> {
       return this.countryService.deleteCountry({ id: id });
     }

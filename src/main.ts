@@ -8,7 +8,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
  //app.useGlobalFilters(new AllExceptionsFilter());
   // app.useGlobalPipes(new ValidationPipe());
-
   app.useGlobalPipes(
     new ValidationPipe({
       disableErrorMessages: true,
@@ -17,13 +16,12 @@ async function bootstrap() {
     }),
   );
 
-
   // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle('My API')
+    .setTitle('CRM API')
     .setDescription('The API description')
     .setVersion('1.0')
-    .addTag('cats')  // Example tag
+    .addTag('CRM') 
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

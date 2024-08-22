@@ -79,8 +79,7 @@ export class UserService {
         
           email: dto.email,
          password: hashedPassword, //dto.password,
-         phone: dto.phone,
-          name: dto.name,
+         phone: dto.phone
          
         },
       });
@@ -186,8 +185,7 @@ export class UserService {
         
           email: dto.email,
           password: hashedPassword, //dto.password,
-          phone: dto.phone,
-          name: dto.name,
+          phone: dto.phone
          
         },
       });

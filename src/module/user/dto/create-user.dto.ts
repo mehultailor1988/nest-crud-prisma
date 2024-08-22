@@ -69,9 +69,9 @@ export class CreateUserDto {
  })
    phone: string;
 
-  @ApiProperty({ description: 'The name of the user' })
-  @IsNotEmpty({ message: "name is required" })
-  name: string;
+  // @ApiProperty({ description: 'The name of the user' })
+  // @IsNotEmpty({ message: "name is required" })
+  // name: string;
 }
 
 export async function validateDto(dto: CreateUserDto): Promise<void> {
