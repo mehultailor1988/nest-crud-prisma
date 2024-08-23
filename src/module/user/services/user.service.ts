@@ -225,17 +225,37 @@ export class UserService {
     }
   }
 
-  async deleteUser(id : string,dto: CreateUserDto): Promise<{statusCode: number; message: string; data: User | null}> {
-    this.logger.log("deleteUser");
+  // async deleteUser(id : string,dto: CreateUserDto): Promise<{statusCode: number; message: string; data: User | null}> {
+  //   this.logger.log("deleteUser");
+  //   try {
+  //     const deleteUser = await this.prisma.user.delete({
+  //       where : { id },
+  //     });
+  //     //return deleteUser;
+  //     return {
+  //       statusCode: HttpStatus.OK,
+  //       message: 'User successfully deleted',
+  //       data: deleteUser,
+  //     };
+  //   } catch (e) {
+  //     throw createCustomError(
+  //       e.message || "Something went wrong",
+  //       e.status || HttpStatus.BAD_REQUEST,
+  //     );
+  //   }
+  // }
+
+  async deleteUser(id : string): Promise<{
+    statusCode: number; message: string; user?: User; 
+  }> {
     try {
-      const deleteUser = await this.prisma.user.delete({
+      const deletedUser = await this.prisma.user.delete({
         where : { id },
       });
-      //return deleteUser;
       return {
-        statusCode: HttpStatus.OK,
-        message: 'User successfully deleted',
-        data: deleteUser,
+        user: deletedUser,
+        statusCode: HttpStatus.OK, // Successful deletion
+        message: "User successfully deleted.",
       };
     } catch (e) {
       throw createCustomError(
@@ -243,7 +263,36 @@ export class UserService {
         e.status || HttpStatus.BAD_REQUEST,
       );
     }
-  }
+   }
+
+
+// async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<{ user?: User; statusCode: number; message: string }> {
+//   this.logger.log("deleteUser");
+//   try {
+//       // Attempt to delete the user based on the provided unique identifier
+//       const deletedUser = await this.prisma.user.delete({
+//           where,
+//       });
+//       return {
+//           user: deletedUser,
+//           statusCode: HttpStatus.OK, // Successful deletion
+//           message: "User successfully deleted.",
+//       };
+//   } catch (e) {
+//       // Log the error message for debugging
+//       this.logger.error(`Error deleting user: ${e.message}`);
+
+//       // Determine the status code and message based on the error type
+//       const statusCode = e.status || HttpStatus.BAD_REQUEST;
+//       const errorMessage = e.message || "Failed to delete user. Please try again.";
+
+//       // Return an object with status code and message
+//       return {
+//           statusCode,
+//           message: errorMessage,
+//       };
+//   }
+// }
 
   async UserLogin(email: string, password: string): Promise<{ status: number; message: string; data?: UserDto }> {
     try {

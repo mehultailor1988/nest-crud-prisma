@@ -7,7 +7,20 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
  //app.useGlobalFilters(new AllExceptionsFilter());
-  // app.useGlobalPipes(new ValidationPipe());
+ //app.useGlobalPipes(new ValidationPipe());
+
+ //Cors
+  app.enableCors();
+
+  app.enableCors({
+    origin: 'http://localhost:3000', 
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true,
+  });
+ //over
+
+ //Validation
   app.useGlobalPipes(
     new ValidationPipe({
       disableErrorMessages: true,
@@ -15,6 +28,7 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+  //over
 
   // Swagger configuration
   const config = new DocumentBuilder()

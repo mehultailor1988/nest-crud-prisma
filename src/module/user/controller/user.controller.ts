@@ -12,11 +12,11 @@ import {
     HttpStatus,
   } from "@nestjs/common";
   import { UserService } from "../services/user.service";
-  import { User as UserModel } from "@prisma/client";
   import { UpdateUserDto  } from '../dto/update-user.dto';
-  import { CreateUserDto, validateDto } from '../dto/create-user.dto';
+  import { CreateUserDto } from '../dto/create-user.dto';
   import { UserDto } from "../dto";
   import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam  } from '@nestjs/swagger';
+  import { User } from '@prisma/client';
   
   @ApiTags('User')
   @Controller("user")
@@ -200,12 +200,19 @@ import {
     @ApiOperation({ summary: 'Delete a user by ID' })
     @ApiResponse({ status: 200, description: 'The user has been successfully deleted.', type: UserDto })
     @ApiResponse({ status: 404, description: 'User not found' })
-    // async deleteUser(@Param("id") id: string): Promise<UserModel> {
-    //   return this.userService.deleteUser({ id: id });
+    async deleteUser(@Param("id") id: string): Promise<{ statusCode: number; message: string; data?: UserDto }> {
+      
+      const response = await this.userService.deleteUser(id);
+      return {
+        statusCode: response.statusCode,
+        message: response.message,
+
+      };
+     }
+    // async deleteUser(@Param('id') id: string,@Body() dto: CreateUserDto) {
+    //   return this.userService.deleteUser(id, dto);
     // }
-    async deleteUser(@Param('id') id: string,@Body() dto: CreateUserDto) {
-      return this.userService.deleteUser(id, dto);
-    }
+   
 
     /**
      * @summary Authenticate a user and return authentication token
