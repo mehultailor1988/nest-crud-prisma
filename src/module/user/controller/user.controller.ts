@@ -23,10 +23,10 @@ import {
   export class UserController {
     constructor(private readonly userService: UserService) {}
   
-  /**
+ /**
      * @summary Retrieve a list of all users
      * @description Retrieves a list of all registered users in the system.
-     * @url http://localhost:3000/user
+     * @url [http://localhost:3000/user](http://localhost:3000/user)
      * @method GET
      * @returns {UserDto[]} An array of user objects.
      * @example
@@ -46,8 +46,16 @@ import {
      */
 
     @Get()
-    @ApiOperation({ summary: 'Get all users' })
-    //@ApiResponse({ status: 200, description: 'List of all users', type: [UserDto] })
+    @ApiOperation({ summary: 'Retrieve all users' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'List of all users retrieved successfully.',
+        type: [UserDto],
+    })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        description: 'Failed to retrieve users.',
+    })
     async getAllUsers(): Promise<{ statusCode: number; message: string; data: UserDto[] }> {
       //return this.userService.getAllUsers();
       try {
@@ -61,10 +69,10 @@ import {
     }
     
   
-     /**
+    /**
      * @summary Retrieve a user by their ID
      * @description Retrieves the details of a user specified by their ID.
-     * @url http://localhost:3000/user/{id}
+     * @url [http://localhost:3000/user/{id}](http://localhost:3000/user/{id})
      * @method GET
      * @param {string} id - The ID of the user to retrieve.
      * @returns {UserDto} The user object.
@@ -81,9 +89,21 @@ import {
      * }
      */
     @Get(":id")
-    @ApiOperation({ summary: 'Get a user by ID' })
-    @ApiResponse({ status: 200, description: 'User details', type: UserDto })
-    @ApiResponse({ status: 404, description: 'User not found' })
+    @ApiOperation({ summary: 'Retrieve a user by ID' })
+    @ApiParam({
+      name: 'id',
+      description: 'The unique identifier of the user',
+      type: String,
+    })
+    @ApiResponse({
+      status: HttpStatus.OK,
+      description: 'User details retrieved successfully.',
+      type: UserDto,
+    })
+    @ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'User not found.',
+    })
     async getUser(@Param("id") id: string): Promise<{ statusCode: number; message: string; data?: UserDto }>{
       //return this.userService.user({ id: id });
       try {
@@ -96,11 +116,10 @@ import {
       }
     }
     
-  
-      /**
+  /**
      * @summary Create a new user
      * @description Creates a new user with the provided details.
-     * @url http://localhost:3000/user
+     * @url [http://localhost:3000/user](http://localhost:3000/user)
      * @method POST
      * @requestBody
      * @param {CreateUserDto} userData - The details of the user to be created.
@@ -125,8 +144,16 @@ import {
      */
     @Post()
     @ApiOperation({ summary: 'Create a new user' })
-    @ApiResponse({ status: 201, description: 'The user has been successfully created.', type: UserDto })
-    @ApiResponse({ status: 400, description: 'Bad request.' })
+    @ApiBody({ type: CreateUserDto })
+    @ApiResponse({
+        status: HttpStatus.CREATED,
+        description: 'User created successfully.',
+        type: UserDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST,
+        description: 'Invalid input data.',
+    })
     // async signupUser(
     //   @Body() userData: { email: string, password: string, phone: string },
     // ): Promise<UserModel> {
@@ -136,10 +163,10 @@ import {
       return this.userService.createUser(dto);
     }
 
-     /**
+    /**
      * @summary Update user details by ID
      * @description Updates the details of an existing user specified by their ID.
-     * @url http://localhost:3000/user/{id}
+     * @url [http://localhost:3000/user/{id}](http://localhost:3000/user/{id})
      * @method PUT
      * @param {string} id - The ID of the user to update.
      * @requestBody
@@ -152,22 +179,37 @@ import {
      *   "email": "Test@gmail.com",
      *   "password": "newpassword",
      *   "phone": "+0987654321",
-     *   "name": "Test"
+     *   
      * }
      * 
      * // Example response
      * {
      *   "id": "1",
-     *   "email": "Test@gmail.com",
-     *   "name": "Test",
+     *   "email": "Test@gmail.com",     *   
      *   "phone": "+0987654321"
      * }
      */
     @Put(":id")
-    @ApiOperation({ summary: 'Update an existing user' })
+    @ApiOperation({ summary: 'Update user details by ID' })
+    @ApiParam({
+        name: 'id',
+        description: 'The unique identifier of the user',
+        type: String,
+    })
     @ApiBody({ type: UpdateUserDto })
-    @ApiResponse({ status: 200, description: 'The user has been successfully updated.', type: UserDto })
-    @ApiResponse({ status: 404, description: 'User not found' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'User updated successfully.',
+        type: UserDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.NOT_FOUND,
+        description: 'User not found.',
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST,
+        description: 'Invalid input data.',
+    })
     // async updateUser(
     //   @Param("id") id: string,
     //   @Body() UserData: { email: string, password: string, phone: string },
@@ -177,10 +219,11 @@ import {
     async updateUser(@Param('id') id: string,@Body() dto: CreateUserDto) {
       return this.userService.updateUser(id, dto);
     }
-     /**
-     * @summary Delete a user by their ID
+
+    /**
+     * @summary Delete a user by ID
      * @description Deletes a user specified by their ID.
-     * @url http://localhost:3000/user/{id}
+     * @url [http://localhost:3000/user/{id}](http://localhost:3000/user/{id})
      * @method DELETE
      * @param {string} id - The ID of the user to delete.
      * @returns {UserDto} The deleted user object.
@@ -198,8 +241,20 @@ import {
      */
     @Delete(":id")
     @ApiOperation({ summary: 'Delete a user by ID' })
-    @ApiResponse({ status: 200, description: 'The user has been successfully deleted.', type: UserDto })
-    @ApiResponse({ status: 404, description: 'User not found' })
+    @ApiParam({
+        name: 'id',
+        description: 'The unique identifier of the user',
+        type: String,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'User deleted successfully.',
+        type: UserDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.NOT_FOUND,
+        description: 'User not found.',
+    })
     async deleteUser(@Param("id") id: string): Promise<{ statusCode: number; message: string; data?: UserDto }> {
       
       const response = await this.userService.deleteUser(id);
@@ -214,40 +269,41 @@ import {
     // }
    
 
-    /**
+     /**
      * @summary Authenticate a user and return authentication token
-     * @description Authenticates a user with provided credentials and returns an authentication token.
-     * @url http://localhost:3000/user/login
+     * @description Authenticates a user using their credentials and returns an authentication token.
+     * @url [http://localhost:3000/user/login](http://localhost:3000/user/login)
      * @method POST
      * @requestBody
-     * @param {CreateUserDto} body - The user's login credentials.
-     * @returns {object} - Contains status, message, and optionally user data.
+     * @param {CreateUserDto} loginData - The login credentials.
+     * @returns {UserDto} The user object with authentication token.
      * @example
      * // Example request
      * POST http://localhost:3000/user/login
      * {
      *   "email": "Test@gmail.com",
-     *   "password": "test@123"
+     *   "password": "Test@123"
      * }
      * 
      * // Example response
      * {
-     *   "status": 200,
-     *   "message": "Login successful",
-     *   "data": {
-     *     "id": "1",
-     *     "email": "Test@gmail.com",
-     *     "name": "Test",
-     *     "phone": "+1234567890"
-     *   }
+     *   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTYiLCJleHBpcmVkX2JldGFnIjoiZGF0YSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
      * }
      */
+
     @ApiTags('Login')
     @Post(':login')
-    @ApiOperation({ summary: 'Login a user' })
-    @ApiBody({ type: CreateUserDto }) // Adjust if needed; assuming login data is the same as user creation
-    @ApiResponse({ status: 200, description: 'Successful login', type: UserDto })
-    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiOperation({ summary: 'Authenticate a user and return authentication token' })
+    @ApiBody({ type: CreateUserDto }) // Assuming login data is similar to user creation; adjust if necessary
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Login successful.',
+        type: UserDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.UNAUTHORIZED,
+        description: 'Invalid credentials.',
+    })
     async login(@Body() body: { email: string; password: string }): Promise<{ status: number; message: string; data?: UserDto  }> {
       const { email, password } = body;
   
@@ -262,54 +318,51 @@ import {
       };
     }
 
-    /**
-   * @route POST /tokens/:userid
-   * @description Creates a token for a specified user.
-   * @param {string} userid - The unique identifier of the user.
-   * @returns {object} The object containing the generated token.
-   * @throws {HttpException} Throws 500 if unable to create token.
-   * @example
-   * curl -X POST http://localhost:3000/user/tokens/12345
-   * 
-   * Response:
-   * {
-   *   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTYiLCJleHBpcmVkX2JldGFnIjoiZGF0YSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-   * }
-   * 
-   * Error Response:
-   * {
-   *   "statusCode": 500,
-   *   "message": "Unable to create token"
-   * }
-   */
+     /**
+     * @summary Create a token for a user
+     * @description Generates a token for a specified user using their unique ID.
+     * @url [http://localhost:3000/user/token/{userid}](http://localhost:3000/user/token/{userid})
+     * @method POST
+     * @param {string} userid - The ID of the user for whom the token is created.
+     * @returns {Object} The generated token.
+     * @example
+     * // Example request
+     * POST http://localhost:3000/user/token/1
+     * 
+     * // Example response
+     * {
+     *   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTYiLCJleHBpcmVkX2JldGFnIjoiZGF0YSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+     * }
+     */
+    
   @ApiTags('token')
   @Post('token/:userid')
   @ApiOperation({ summary: 'Create a token for a user' })
   @ApiParam({
-    name: 'userid',
-    description: 'The unique identifier of the user',
-    type: String
+      name: 'userid',
+      description: 'The unique identifier of the user',
+      type: String,
   })
   @ApiResponse({
-    status: 201,
-    description: 'Token successfully created',
-    schema: {
-      example: {
-        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTYiLCJleHBpcmVkX2JldGFnIjoiZGF0YSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
-      }
-    }
+      status: HttpStatus.CREATED,
+      description: 'Token successfully created.',
+      schema: {
+          example: {
+              token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTYiLCJleHBpcmVkX2JldGFnIjoiZGF0YSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+          },
+      },
   })
   @ApiResponse({
-    status: 500,
-    description: 'Internal Server Error - Unable to create token',
-    schema: {
-      example: {
-        statusCode: 500,
-        message: 'Unable to create token'
-      }
-    }
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Unable to create token.',
+      schema: {
+          example: {
+              statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+              message: 'Unable to create token'
+          },
+      },
   })
-    async createToken(@Param('userid') userid: string): Promise<{ token: string }> {
+  async createToken(@Param('userid') userid: string): Promise<{ token: string }> {
       try {
         const token = await this.userService.createToken(userid);
         return { token };
