@@ -176,7 +176,7 @@ export class UserService {
       });
       return {
         user: deletedUser,
-        statusCode: HttpStatus.OK, // Successful deletion
+        statusCode: HttpStatus.OK, 
         message: "User successfully deleted.",
       };
     } catch (e) {
@@ -230,7 +230,7 @@ export class UserService {
       );
     }
   }  
-  
+
   // async createToken(userid : string, token: string): Promise<{userid : string, token: string}> {
   //   try {
   //     // Validate the DTO

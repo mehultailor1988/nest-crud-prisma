@@ -15,7 +15,7 @@ export class CountryService {
 
   async country(
     countryWhereUniqueInput: Prisma.CountryWhereUniqueInput,
-  ): Promise<Country | null> {
+  ): Promise<{statusCode: number; message: string; data?:Country }> {
     this.logger.log("countryById");
     try {
       const country = await this.prisma.country.findUnique({
@@ -26,7 +26,13 @@ export class CountryService {
       }
       console.log("country", typeof(country));
       
-      return plainToInstance(CountryDto, country);
+      //return plainToInstance(CountryDto, country);
+      const countryDto = plainToInstance(CountryDto, country);
+      return {
+        statusCode: HttpStatus.OK,
+        message: "User found successfully",
+        data: countryDto,
+      };
     } catch (e) {
       throw createCustomError(
         e.message || "Something went wrong",
@@ -35,11 +41,17 @@ export class CountryService {
     }
   }
 
-  async getAllCountry() {
+  async getAllCountry() : Promise<{statusCode: number; message: string; data:CountryDto[] }>{
     this.logger.log("getAllCountry");
     try {
       const country = await this.prisma.country.findMany();
-      return plainToInstance(CountryDto, country);
+      // return plainToInstance(CountryDto, country);
+      const countryData = plainToInstance(CountryDto, country);
+      return {
+        statusCode: HttpStatus.OK,
+        message: "User found successfully",
+        data: countryData,
+      };
     } catch (e) {
       throw createCustomError(
         e.message || "Something went wrong",
@@ -47,20 +59,29 @@ export class CountryService {
       );
     }
   }
-
-
-  // async createCountry(data: Prisma.CountryCreateInput): Promise<Country> {
-  //   this.logger.log("createCountry");
+  
+  // async createCountry(dto: CreateCountryDto): Promise<Country> {
   //   try {
+  //     // Validate the DTO
+  //     await validateDto(dto);
+
+  //     // Create the country
   //     const createCountry = await this.prisma.country.create({
-  //       data,
+  //       data: {
+        
+  //         CountryCode: dto.CountryCode,
+  //         CountryName: dto.CountryName,
+  //         Active: dto.Active,
+  //         SortSeq: dto.SortSeq,
+         
+  //       },
   //     });
-  //     console.log("createCountry", createCountry);
-      
+
+  //     console.log("country created:", createCountry);
   //     return createCountry;
   //   } catch (e) {
   //     console.log("ERROR", e);
-      
+
   //     throw createCustomError(
   //       e.message || "Something went wrong",
   //       e.status || HttpStatus.BAD_REQUEST,
@@ -68,27 +89,31 @@ export class CountryService {
   //   }
   // }
 
-
-  
-  async createCountry(dto: CreateCountryDto): Promise<Country> {
+  async createCountry(dto: CreateCountryDto): Promise<{ statusCode: number; message: string; data: Country | null }> {
     try {
       // Validate the DTO
       await validateDto(dto);
 
-      // Create the country
-      const createCountry = await this.prisma.country.create({
+     
+
+      // Create the user
+      const createCountry = await this.prisma.country.create({        
         data: {
         
           CountryCode: dto.CountryCode,
           CountryName: dto.CountryName,
           Active: dto.Active,
-          SortSeq: dto.SortSeq,
-         
+          SortSeq: dto.SortSeq,         
         },
       });
 
-      console.log("country created:", createCountry);
-      return createCountry;
+      console.log("User created:", createCountry);
+      //return createUser;
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Country successfully created',
+        data: createCountry,
+      };
     } catch (e) {
       console.log("ERROR", e);
 
@@ -121,16 +146,46 @@ export class CountryService {
 
 
   
-  async updateCountry(id : string,dto: CreateCountryDto): Promise<Country> {
+  // async updateCountry(id : string,dto: CreateCountryDto): Promise<Country> {
+  //   try {
+  //     // Validate the DTO
+  //     await validateDto(dto);
+
+  //     // Create the user
+  //     const updateCountry = await this.prisma.country.update({
+  //       where: { id },
+  //       data: {
+        
+  //         CountryCode: dto.CountryCode,
+  //         CountryName: dto.CountryName,
+  //         Active: dto.Active,
+  //         SortSeq: dto.SortSeq,
+         
+  //       },
+  //     });
+
+  //     console.log("User created:", updateCountry);
+  //     return updateCountry;
+  //   } catch (e) {
+  //     console.log("ERROR", e);
+
+  //     throw createCustomError(
+  //       e.message || "Something went wrong",
+  //       e.status || HttpStatus.BAD_REQUEST,
+  //     );
+  //   }
+  // }
+  
+  async updateCountry(id : string,dto: CreateCountryDto): Promise<{ statusCode: number; message: string; data: Country | null}> {
     try {
       // Validate the DTO
       await validateDto(dto);
 
-      // Create the user
+    
+      // Update the Country
       const updateCountry = await this.prisma.country.update({
         where: { id },
         data: {
-        
           CountryCode: dto.CountryCode,
           CountryName: dto.CountryName,
           Active: dto.Active,
@@ -139,8 +194,13 @@ export class CountryService {
         },
       });
 
-      console.log("User created:", updateCountry);
-      return updateCountry;
+      console.log("Country created:", updateCountry);
+      //return createUser;
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Country successfully updated',
+        data: updateCountry,
+      };
     } catch (e) {
       console.log("ERROR", e);
 
@@ -152,13 +212,31 @@ export class CountryService {
   }
   
 
-  async deleteCountry(where: Prisma.CountryWhereUniqueInput): Promise<Country> {
-    this.logger.log("deleteCountry");
+  // async deleteCountry(where: Prisma.CountryWhereUniqueInput): Promise<Country> {
+  //   this.logger.log("deleteCountry");
+  //   try {
+  //     const deleteCountry = await this.prisma.country.delete({
+  //       where,
+  //     });
+  //     return deleteCountry;
+  //   } catch (e) {
+  //     throw createCustomError(
+  //       e.message || "Something went wrong",
+  //       e.status || HttpStatus.BAD_REQUEST,
+  //     );
+  //   }
+  //  }
+
+  async deleteCountry(id : string): Promise<{statusCode: number; message: string; data: Country | null }> {
     try {
       const deleteCountry = await this.prisma.country.delete({
-        where,
+        where : { id },
       });
-      return deleteCountry;
+      return {
+        data: deleteCountry,
+        statusCode: HttpStatus.OK, // Successful deletion
+        message: "Country successfully deleted.",
+      };
     } catch (e) {
       throw createCustomError(
         e.message || "Something went wrong",
@@ -167,23 +245,4 @@ export class CountryService {
     }
    }
 
-  // create(createCountryDto: CreateCountryDto) {
-  //   return 'This action adds a new country';
-  // }
-
-  // findAll() {
-  //   return `This action returns all country`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} country`;
-  // }
-
-  // update(id: number, updateCountryDto: UpdateCountryDto) {
-  //   return `This action updates a #${id} country`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} country`;
-  // }
 }

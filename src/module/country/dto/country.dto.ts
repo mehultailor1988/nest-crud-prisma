@@ -1,5 +1,7 @@
 import { Expose } from "class-transformer";
 import { AbstractDto } from "src/common";
+import { IsEmail, IsNotEmpty, IsString, MinLength, validate } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * Data Transfer Object (DTO) for representing a country.
@@ -20,13 +22,16 @@ import { AbstractDto } from "src/common";
 
 export class CountryDto extends AbstractDto {
 
+  @ApiProperty({ example: '1', description: 'The unique identifier of the country' })
+  id: string;
     /**
    * Country code (e.g., 'US').
    * 
    * @type {string}
    * @example 'US'
    */
-  @Expose()
+  @ApiProperty({ example: 'US', description: 'The country code' })
+  @IsNotEmpty()
   CountryCode: string;
 
 /**
@@ -35,7 +40,8 @@ export class CountryDto extends AbstractDto {
    * @type {string}
    * @example 'United States'
    */
-  @Expose()
+  @ApiProperty({ example: 'United States', description: 'The name of the country' })
+  @IsNotEmpty()
   CountryName: string;
 
    /**
@@ -44,7 +50,8 @@ export class CountryDto extends AbstractDto {
    * @type {boolean}
    * @example true/false
    */
-  @Expose()
+  @ApiProperty({ example: true, description: 'Whether the country is active' })
+  @IsNotEmpty()
   Active: boolean;
 
    /**
@@ -53,6 +60,7 @@ export class CountryDto extends AbstractDto {
    * @type {number}
    * @example 1
    */
-  @Expose()
+  @ApiProperty({ example: 1, description: 'Sort sequence number' })
+  @IsNotEmpty()
   SortSeq: number;
 }
