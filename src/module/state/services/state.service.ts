@@ -15,7 +15,7 @@ export class StateService {
   
   async state(
     StateWhereUniqueInput: Prisma.StateWhereUniqueInput,
-  ): Promise<State | null> {
+  ): Promise<{ statusCode: number; message: string; data?: StateDto}> {
     this.logger.log("stateById");
     try {
       const state = await this.prisma.state.findUnique({
@@ -24,7 +24,13 @@ export class StateService {
       if (!state) {
         throw createCustomError("State not found", HttpStatus.NOT_FOUND);
       }     
-      return plainToInstance(StateDto, state);
+     // return plainToInstance(StateDto, state);
+     const DataState = plainToInstance(StateDto, state);
+     return {
+      statusCode: HttpStatus.OK,
+      message: "State found successfully",
+      data: DataState, 
+    };
     } catch (e) {
       throw createCustomError(
         e.message || "Something went wrong",
@@ -33,11 +39,17 @@ export class StateService {
     }
   }
 
-  async getAllState() {
+  async getAllState() : Promise<{ statusCode: number; message: string; data: StateDto[] }> {
     this.logger.log("getAllCountry");
     try {
       const state = await this.prisma.state.findMany();
-      return plainToInstance(StateDto, state);
+     // return plainToInstance(StateDto, state);
+     const DataState = plainToInstance(StateDto, state);
+     return {
+      statusCode: HttpStatus.OK,
+      message: "State found successfully",
+      data: DataState, 
+    };
     } catch (e) {
       throw createCustomError(
         e.message || "Something went wrong",
@@ -65,7 +77,7 @@ export class StateService {
   //   }
   // }
 
-  async createState(dto: CreateStatetDto): Promise<State> {
+  async createState(dto: CreateStatetDto): Promise<{ statusCode: number; message: string; data:State | null }> {
     try {
       // Validate the DTO
       await validateDto(dto);
@@ -84,7 +96,12 @@ export class StateService {
       });
 
       console.log("state created:", createstate);
-      return createstate;
+      //return createstate;
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'state created successfully',
+        data: createstate,
+      };
     } catch (e) {
       console.log("ERROR", e);
 
@@ -117,7 +134,7 @@ export class StateService {
 
   
   
-  async updateState(id : string,dto: CreateStatetDto): Promise<State> {
+  async updateState(id : string,dto: CreateStatetDto): Promise<{ statusCode: number; message: string; data:State | null }> {
     try {
       // Validate the DTO
       await validateDto(dto);
@@ -137,7 +154,12 @@ export class StateService {
       });
 
       console.log("Update State:", Upadtestate);
-      return Upadtestate;
+      //return Upadtestate;
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'state updated successfully',
+        data: Upadtestate,
+      };
     } catch (e) {
       console.log("ERROR", e);
 
@@ -149,13 +171,18 @@ export class StateService {
   }
 
   
-  async deleteState(where: Prisma.StateWhereUniqueInput): Promise<State> {
+  async deleteState(id : string): Promise<{ statusCode: number; message: string; data:State | null }> {
     this.logger.log("deleteState");
     try {
       const deleteState = await this.prisma.state.delete({
-        where,
+        where : { id },
       });
-      return deleteState;
+      //return deleteState;
+      return {
+        data: deleteState,
+        statusCode: HttpStatus.OK, 
+        message: "State deleted successfully.",
+      };
     } catch (e) {
       throw createCustomError(
         e.message || "Something went wrong",
@@ -163,24 +190,4 @@ export class StateService {
       );
     }
    }
-
-  // create(createStateDto: CreateStateDto) {
-  //   return 'This action adds a new state';
-  // }
-
-  // findAll() {
-  //   return `This action returns all state`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} state`;
-  // }
-
-  // update(id: number, updateStateDto: UpdateStateDto) {
-  //   return `This action updates a #${id} state`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} state`;
-  // }
 }

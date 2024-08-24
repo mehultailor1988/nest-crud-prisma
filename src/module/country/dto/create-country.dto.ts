@@ -1,5 +1,6 @@
 import { IsEmail, IsNotEmpty, validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCountryDto { 
   
@@ -9,6 +10,7 @@ export class CreateCountryDto {
    * @type {string}
    * @example 'US'
    */
+   @ApiProperty({ description: 'Country Code is required' })
   @IsNotEmpty({ message: "Country Code is required" })
   CountryCode: string;
 
@@ -18,6 +20,7 @@ export class CreateCountryDto {
    * @type {string}
    * @example 'United States'
    */
+   @ApiProperty({ description: 'Country Name is required' })
   @IsNotEmpty({ message: "Country Name is required" })
   CountryName: string;
 
@@ -27,6 +30,7 @@ export class CreateCountryDto {
    * @type {boolean}
    * @example true/false
    */
+  @ApiProperty({ description: 'Active is required' })
   @IsNotEmpty({ message: "Active is required" })
   Active: boolean;
 
@@ -36,6 +40,7 @@ export class CreateCountryDto {
    * @type {number}
    * @example 1
    */
+   @ApiProperty({ description: 'Sort Sequence is required' })
   @IsNotEmpty({ message: "Sort Sequence is required" })
   SortSeq: number;
 }

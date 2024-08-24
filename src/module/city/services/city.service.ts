@@ -15,7 +15,7 @@ export class CityService {
 
   async city(
     CityWhereUniqueInput: Prisma.CityWhereUniqueInput,
-  ): Promise<City | null> {
+  ): Promise<{ statusCode: number; message: string; data?: CityDto}> {
     this.logger.log("userById");
     try {
       const city = await this.prisma.city.findUnique({
@@ -24,7 +24,12 @@ export class CityService {
       if (!city) {
         throw createCustomError("City not found", HttpStatus.NOT_FOUND);
       }
-      return plainToInstance(CityDto, city);
+      const citydata = plainToInstance(CityDto, city);
+      return {
+        statusCode: HttpStatus.OK,
+        message: "City found successfully",
+        data: citydata,
+      };
     } catch (e) {
       throw createCustomError(
         e.message || "Something went wrong",
@@ -33,11 +38,17 @@ export class CityService {
     }
   }
   
-  async getAllCity() {
+  async getAllCity() : Promise<{ statusCode: number; message: string; data: CityDto[] }>{
     this.logger.log("getAllCity");
     try {
       const city = await this.prisma.city.findMany();
-      return plainToInstance(CityDto, city);
+      //return plainToInstance(CityDto, city);
+      const citydata = plainToInstance(CityDto, city);
+      return {
+        statusCode: HttpStatus.OK,
+        message: "City retrieved successfully",
+        data: citydata,
+      };      
     } catch (e) {
       throw createCustomError(
         e.message || "Something went wrong",
@@ -46,29 +57,7 @@ export class CityService {
     }
   }
   
-  
-  // async createCity(data: Prisma.CityCreateInput): Promise<City> {
-  //   this.logger.log("createCity");
-  //   try {
-  //     const createCity = await this.prisma.city.create({
-  //       data,
-  //     });
-  //     console.log("createCity", createCity);
-      
-  //     return createCity;
-  //   } catch (e) {
-  //     console.log("ERROR", e);
-      
-  //     throw createCustomError(
-  //       e.message || "Something went wrong",
-  //       e.status || HttpStatus.BAD_REQUEST,
-  //     );
-  //   }
-  // }
-
-
-  
-  async createCity(dto: CreateCityDto): Promise<City> {
+  async createCity(dto: CreateCityDto): Promise<{ statusCode: number; message: string; data:City}> {
     try {
       // Validate the DTO
       await validateDto(dto);
@@ -87,7 +76,12 @@ export class CityService {
       });
 
       console.log("City created:", createcity);
-      return createcity;
+      //return createcity;
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'City created successfully.',
+        data: createcity,
+      };
     } catch (e) {
       console.log("ERROR", e);
 
@@ -97,28 +91,7 @@ export class CityService {
       );
     }
   }
-  
-  // async updateCity(params: {
-  //   where: Prisma.CityWhereUniqueInput;
-  //   data: Prisma.CityUpdateInput;
-  // }): Promise<City> {
-  //   this.logger.log("updateCity");
-  //   try {
-  //     const updateCity = await this.prisma.city.update({
-  //       where: params.where,
-  //       data: params.data,
-  //     });
-  //     return updateCity;
-  //   } catch (e) {
-  //     throw createCustomError(
-  //       e.message || "Something went wrong",
-  //       e.status || HttpStatus.BAD_REQUEST,
-  //     );
-  //   }
-  // }
-
-  
-  async updateCity(id : string,dto: CreateCityDto): Promise<City> {
+  async updateCity(id : string,dto: CreateCityDto): Promise<{ statusCode: number; message: string; data:City}> {
     try {
       // Validate the DTO
       await validateDto(dto);
@@ -138,7 +111,12 @@ export class CityService {
       });
 
       console.log("Update City:", Upadtecity);
-      return Upadtecity;
+      //return Upadtecity;
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'City updated successfully.',
+        data: Upadtecity,
+      };
     } catch (e) {
       console.log("ERROR", e);
 
@@ -150,13 +128,18 @@ export class CityService {
   }
     
 
-  async deleteCity(where: Prisma.CityWhereUniqueInput): Promise<City> {
+  async deleteCity(id : string): Promise<{ statusCode: number; message: string; data?:City;}> {
     this.logger.log("deleteUser");
     try {
       const deleteCity = await this.prisma.city.delete({
-        where,
+        where: { id },
       });
-      return deleteCity;
+      //return deleteCity;
+      return {
+        data: deleteCity,
+        statusCode: HttpStatus.OK, 
+        message: "City deleted successfully.",
+      };
     } catch (e) {
       throw createCustomError(
         e.message || "Something went wrong",

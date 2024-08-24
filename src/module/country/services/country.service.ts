@@ -49,7 +49,7 @@ export class CountryService {
       const countryData = plainToInstance(CountryDto, country);
       return {
         statusCode: HttpStatus.OK,
-        message: "User found successfully",
+        message: "Country found successfully",
         data: countryData,
       };
     } catch (e) {

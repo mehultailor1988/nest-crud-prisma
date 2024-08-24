@@ -1,20 +1,21 @@
 import { Expose } from "class-transformer";
 import { AbstractDto } from "src/common";
+import { IsNotEmpty } from "class-validator";
 
 export class StateDto extends AbstractDto {
-  @Expose()
+  @IsNotEmpty()
   StateCode: string;
 
-  @Expose()
+  @IsNotEmpty()
   StateName: string;
 
-  @Expose()
+  @IsNotEmpty()
   CountryCode: string;
 
-  @Expose()
+  @IsNotEmpty()
   Active: boolean;
 
-  @Expose()
+  @IsNotEmpty()
   SortSeq: number;
 
 }

@@ -9,16 +9,16 @@ async function bootstrap() {
  //app.useGlobalFilters(new AllExceptionsFilter());
  //app.useGlobalPipes(new ValidationPipe());
 
- //Cors
-  app.enableCors();
+//  //Cors
+//   app.enableCors();
 
-  app.enableCors({
-    origin: 'http://localhost:3000', 
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type, Authorization',
-    credentials: true,
-  });
- //over
+//   app.enableCors({
+//     origin: 'http://localhost:3000', 
+//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+//     allowedHeaders: 'Content-Type, Authorization',
+//     credentials: true,
+//   });
+//  //over
 
  //Validation
   app.useGlobalPipes(

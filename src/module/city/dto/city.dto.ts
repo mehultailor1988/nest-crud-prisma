@@ -1,19 +1,21 @@
 import { Expose } from "class-transformer";
+import { IsEmail, IsNotEmpty, IsString, MinLength, validate } from "class-validator";
 import { AbstractDto } from "src/common";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CityDto extends AbstractDto {
-  @Expose()
+  @IsNotEmpty()
   CityName: string;
 
-  @Expose()
+  @IsNotEmpty()
   StateCode: string;
 
-  @Expose()
+  @IsNotEmpty()
   CountryCode: string;
 
-  @Expose()
+  @IsNotEmpty()
   Active: boolean;
 
-  @Expose()
+  @IsNotEmpty()
   SortSeq: number;
 }
