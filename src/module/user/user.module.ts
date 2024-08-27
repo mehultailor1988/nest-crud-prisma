@@ -7,8 +7,8 @@ import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports: [
     JwtModule.register({
-      secret: '19Meh@l$88', // Replace with your secret
-      signOptions: { expiresIn: '60m' }, // Token expiration time
+      secret: 'Admin@123',
+      signOptions: { expiresIn: '24h' }, 
     }),
     PrismaModule
   ],

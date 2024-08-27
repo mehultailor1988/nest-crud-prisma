@@ -2,6 +2,7 @@ import {  IsEmail, IsEmpty, IsNotEmpty, Matches, MinLength, validate ,  } from "
 import { plainToInstance } from "class-transformer";
 import { ApiProperty } from '@nestjs/swagger';
 
+
 export class CreateUserDto {
   @ApiProperty({ description: 'The email of the user' })
   @IsEmail()
@@ -86,3 +87,4 @@ export async function validateDto(dto: CreateUserDto): Promise<void> {
     throw new Error(`Validation failed: ${messages}`);
   }
 }
+

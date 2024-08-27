@@ -9,7 +9,7 @@ datasource db {
 
 model Token {
   tokenid        String   @id @default(uuid())
-  userid         String
+  userid         String @unique
   token          String
   
 }
