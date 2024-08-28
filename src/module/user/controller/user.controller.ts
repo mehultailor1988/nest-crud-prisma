@@ -16,7 +16,7 @@ import { UserDto } from "../dto";
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import { Token, User } from '@prisma/client';
 
-@ApiTags('User')
+// @ApiTags('User')
 @Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) { }
@@ -44,6 +44,7 @@ export class UserController {
       */
 
   @Get()
+  @ApiTags('User')
   @ApiOperation({ summary: 'Retrieve all users' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -87,6 +88,7 @@ export class UserController {
    * }
    */
   @Get(":id")
+  @ApiTags('User')
   @ApiOperation({ summary: 'Retrieve a user by ID' })
   @ApiParam({
     name: 'id',
@@ -141,6 +143,7 @@ export class UserController {
      * }
      */
   @Post()
+  @ApiTags('User')
   @ApiOperation({ summary: 'Create a new user' })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({
@@ -183,6 +186,7 @@ export class UserController {
    * }
    */
   @Put(":id")
+  @ApiTags('User')
   @ApiOperation({ summary: 'Update user details by ID' })
   @ApiParam({
     name: 'id',
@@ -210,7 +214,7 @@ export class UserController {
   /**
    * @summary Delete a user by ID
    * @description Deletes a user specified by their ID.
-   * @url [http://localhost:3000/user/{id}](http://localhost:3000/user/{id})
+   * @url http://localhost:3000/user/1
    * @method DELETE
    * @param {string} id - The ID of the user to delete.
    * @returns {UserDto} The deleted user object.
@@ -227,6 +231,7 @@ export class UserController {
    * }
    */
   @Delete(":id")
+  @ApiTags('User')
   @ApiOperation({ summary: 'Delete a user by ID' })
   @ApiParam({
     name: 'id',
@@ -250,7 +255,78 @@ export class UserController {
     };
   }
 
-  @Post('login')
+  /**
+ * user login requests.
+ *
+ * This endpoint processes login attempts by validating the provided email and password.
+ * It delegates the authentication logic to the `UserLogin` service method and returns
+ * an object containing the login status, a message, and an access token upon successful authentication.
+ *
+ * @param body - The login credentials provided in the request body. 
+ *                It should include:
+ *                - `email`: The user's email address (string).
+ *                - `password`: The user's password (string).
+ * 
+ * @returns A promise that resolves to an object containing:
+ *          - `status`: The HTTP status code (number).
+ *          - `message`: A message indicating the result of the login attempt (string).
+ *          - `access_token`: The JWT access token for authenticated users (string).
+ * 
+ *  @url http://localhost:3000/user/login
+ *  @method POST
+ * @example
+ * POST http://localhost:3000/user/login
+ * Request body:
+ * {
+ *   "email": "Test@gmail.com",
+ *   "password": "Test@123"
+ * }
+ * 
+ * Response:
+ * {
+ *   "status": 200,
+ *   "message": "Login successful",
+ *   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ * }
+ * 
+ */
+  @Post('Login')
+  @ApiTags('login')
+  @ApiOperation({ summary: 'Log in a user' })
+  @ApiBody({
+    description: 'User login credentials',
+    schema: {
+      type: 'object',
+      properties: {
+        email: {
+          type: 'string',
+          description: 'The user email address',
+          example: 'Test@gmail.com',
+        },
+        password: {
+          type: 'string',
+          description: 'The user password',
+          example: 'Test@123',
+        },
+      },
+      required: ['email', 'password'], // Define required fields here
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Login successfully',
+    schema: {
+      example: {
+        status: 200,
+        message: 'Login successfully',
+        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized, invalid credentials',
+  })
   async login(@Body() body: { email: string; password: string }): Promise<{ status: number; message: string; access_token: string }> {
     console.log("body -->", body);
     const { email, password } = body;
@@ -322,6 +398,7 @@ export class UserController {
    */
 
   @Delete("signout/:userid")
+  @ApiTags('Signout')
   @ApiOperation({ summary: 'Sign out user by deleting their token' })
   @ApiParam({
     name: 'userid',
